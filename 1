@@ -1,0 +1,129 @@
+import numpy as np
+from scipy. integrate import odeint
+import matplotlib.pyplot as plt
+
+def dydt(y, a):
+    return y*a
+
+def dydt2(y, a):
+    return -a*y
+
+def dydt3(y, a):
+    return (-y - a)
+
+def dydt4(y,a):
+    return a*y
+
+
+def ph(h):
+    return 1.2255*(pow((1 - (6.5*h)/(288000)), 4.255))
+
+
+def dydtRain(y,t):
+
+    v1,v2 = y
+    cd = 0.5
+    pa = ph(v1)
+    p = 1000
+    d = 0.001
+
+    b = (0.75 * cd * pa) / (p * d)
+
+    return [v2, -9.8 + b*v2**2]
+
+def dydtRain2(y,t):
+    v1,v2 = y
+    cd = 0.5
+    pa = 1
+    p = 1000
+    d = 0.001
+
+    b = (0.75 * cd * pa) / (p * d)
+
+    return [v2, -9.8 + b*v2**2]
+
+def dydtK(y,t):
+    u,v = y
+    return [-u + 0.01 * u * v, v - 0.01 * u * v]
+
+
+def function1():
+    a = np.linspace( 0, 2, 20)
+    y0 = 0.1
+    y = odeint (dydt, y0, a)
+    y = np.array(y).flatten()
+
+    plt.plot( a, y,'-sr', linewidth=3)
+    plt.show()
+
+def function2():
+    a = np.linspace( 0, 2, 20)
+    y0 = 0.1
+    y = odeint (dydt2, y0, a)
+    y = np.array(y).flatten()
+
+    plt.plot( a, y,'-sr', linewidth=3)
+    plt.show()
+
+def function3():
+    a = np.linspace( 0, 2, 20)
+    y0 = 0.1
+    y = odeint (dydt3, y0, a)
+    y = np.array(y).flatten()
+
+    plt.plot( a, y,'-sr', linewidth=3)
+    plt.show()
+
+def function4():
+    a = np.linspace( 0, 2, 20)
+    y0 = 5
+    y = odeint (dydt4, y0, a)
+    y = np.array(y).flatten()
+
+    plt.plot( a, y,'-sr', linewidth=3)
+    plt.show()
+
+def K():
+    t = np.arange(0, 50.0, 0.1)
+    y = [10,100]
+
+    y = odeint(dydtK, y, t)
+    plt.plot(t, abs(y[:, 0]))
+    plt.plot(t, abs(y[:, 1]))
+    plt.show()
+
+
+def rain():
+
+    h = 10000
+    v0 = 0
+
+    u0 = [h,v0]
+    t = np.arange(0, 20.0, 0.1)
+
+    y = odeint(dydtRain, u0, t)
+    y2 = odeint(dydtRain2, u0, t)
+
+    plt.plot(t, abs(y[:, 1]))
+    plt.plot(t, abs(y2[:, 1]))
+
+    plt.show()
+
+
+def v():
+    t = np.arange(0, 20.0, 0.1)
+
+    g = 9.8
+    cd = 0.5
+    pa = 1
+    p = 1000
+    d = 0.001
+
+    b = (0.75 * cd * pa) / (p * d)
+
+    v = np.sqrt(g/b) * (((np.e**(2*np.sqrt(g*b)*t))-1)/(np.e**(2*np.sqrt(g*b)*t)+1))
+
+    plt.plot(v)
+    plt.show()
+
+
