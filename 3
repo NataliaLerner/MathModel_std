@@ -1,0 +1,50 @@
+import numpy as np
+import scipy.linalg as la
+import scipy.interpolate as interp
+from scipy.integrate import odeint
+import scipy.fftpack as fft
+from scipy.signal import argrelmax
+from scipy.signal import argrelmin
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import copy
+
+def func(y,t):
+    u,v = y
+    return [-u + 0.01 * u * v, v - 0.01 * u * v]
+
+def Simple():
+    
+    t = np.arange(0, 50, 0.01)
+    y0 = [10, 100]
+    y = odeint(func, y0, t)
+    
+    arraymax = argrelmax(y[:,0])
+    T = t[arraymax[0][1]] - t[arraymax[0][0]]
+    
+    res = 0
+    for i in range(arraymax[0][0], arraymax[0][1], 1):
+        res +=((y[i][0] +y[i+1][0])/2) * (t[i+1] - t[i])
+    print(res / (t[arraymax[0][1]] - t[arraymax[0][0]]))    #среднее значение в периоде
+
+    plt.plot(y[:,0], y[:, 1])
+
+    plt.show()
+
+def Simple1():
+    t = np.linspace(0, 10, 200)
+    y0 = [10, 100]
+    w = odeint(func, y0, t)
+    
+    y1 = w[:,0]
+    y2 = w[:,1]
+    
+    plt.plot(t, y1, t, y2, linewidth=2)
+    plt.ylabel("z")
+    plt.xlabel("t")
+    plt.grid(True)
+    plt.show() # display
+
+
+
+Simple()
