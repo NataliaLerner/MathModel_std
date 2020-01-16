@@ -1,0 +1,38 @@
+import numpy as np
+from scipy.integrate import odeint
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+
+t = np.arange(0, 20, 0.1)
+ar = [1.0, 0.01, 1.0, 0.01]
+y0 = [10, 100]
+
+def dydt1(y, t, a):
+    u, v = y
+    return [a[0]*(-u) + a[1]*u*v, a[2]*v - a[3]*u*v]
+
+def minF(xr):
+    y1 = odeint(dydt1, y0, t, args = (ar, ))
+    y2 = odeint(dydt1, y0, t, args = (xr, ))
+
+    return np.sum((y1[:, 0] - y2[:, 0])**2 + (y1[:, 1] - y2[:, 1])**2)
+
+def fx():
+    at = [1.0, 0.02, 2.0, 0.01]
+
+    y1=odeint(dydt1, y0, t, args=(ar, ))
+
+
+    res = minimize(minF, at, method="Nelder-Mead", tol=1e-3)
+    print(res.x)
+
+    y2=odeint(dydt1, y0, t, args=(res.x, ))
+
+    plt.plot(t, y1[:, 0])
+    #plt.plot(t, y1[:, 1])
+
+    plt.plot(t, y2[:, 0])
+    #plt.plot(t, y2[:, 1])
+    plt.show()
+
+fx()
