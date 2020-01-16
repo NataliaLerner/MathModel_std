@@ -1,0 +1,82 @@
+import numpy as np
+import scipy.linalg as la
+import scipy.interpolate as interp
+import scipy.integrate as integrate
+import scipy.fftpack as fft
+import scipy.signal as signal
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+def func(u, t, a):
+    f1 = 1 + a * u[1] * u[2]
+    f2 = u[0] - u[1]
+    f3 = 1 - u[0] * u[1]
+
+    return [f1, f2, f3]
+
+#бифуркация
+def Simple():
+    t = np.arange(0, 500, 0.1)
+    u0 = [0.5, 1.5, 1]
+
+    pointsX = []
+    pointsY = []
+
+    a = np.arange(0, 2, 0.01)
+
+    for i in range(len(a)):
+        ta = a[i]
+        u = integrate.odeint(func, u0, t, args=(ta, ))
+
+        pointsMax = []
+        pointsMin = []
+
+        typ = 2
+
+        for i in range(1, len(u) - 1):
+            if (u[i][0] > u[i-1][0]) and (u[i+1][0] < u[i][0]):
+                pointsMax.append(u[i][0])
+
+            if (u[i][0] < u[i-1][0]) and (u[i+1][0] > u[i][0]):
+                pointsMin.append(u[i][0])
+
+            if len(pointsMax) > 0 and len(pointsMin) > 0:
+                if abs(pointsMax[-1] - pointsMin[-1]) < 0.00001:
+                    typ = 0
+                    pointsMin = pointsMin[:-1]
+                    break
+
+                if (abs(pointsMax[-1] - u[i][0]) < 0.00001) and (abs(pointsMin[-1] - u[i][0]) < 0.00001):
+                    typ = 1
+                    break
+
+        if (typ == 0):
+            pointsX.append([pointsMax[-1]])
+            pointsY.append([])
+        if (typ == 1):
+            pointsX.append([pointsMax[-1]])
+            pointsY.append([pointsMin[-1]])
+        if (typ == 2):
+            pointsX.append(pointsMax)
+            pointsY.append(pointsMin)
+
+    grA = []
+    grP = []
+    for i in range(len(pointsX)):
+        for j in range(len(pointsX[i])):
+            grA.append(a[i])
+            grP.append(pointsX[i][j])
+
+    grA2 = []
+    grP2 = []
+    for i in range(len(pointsY)):
+        for j in range(len(pointsY[i])):
+            grA2.append(a[i])
+            grP2.append(pointsY[i][j])
+
+
+    plt.scatter(grA, grP, s=0.2)
+    plt.scatter(grA2, grP2, s=0.2)
+    plt.show()
+
+Simple()
